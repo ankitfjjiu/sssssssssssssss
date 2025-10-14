@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - ArticleHub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container" style="padding: 50px 20px;">
+        <h1>ArticleHub Demo</h1>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h2>🚀 Quick Start Guide</h2>
+            <ol>
+                <li><strong>Admin Panel:</strong> <a href="admin.html" target="_blank">Open Admin Panel</a> (Password: admin123)</li>
+                <li><strong>Add URL:</strong> Enter title "Digital Marketing Guide" and URL "https://google.com"</li>
+                <li><strong>Test Article:</strong> Click the generated Open button</li>
+                <li><strong>Test Flow:</strong> Wait 15 seconds → Click "Click Here" → Scroll down → Click "Continue"</li>
+            </ol>
+        </div>
+        
+        <div style="background: #e7f3ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>📝 Quick Test</h3>
+            <p>Click the button below to test the complete article flow:</p>
+            
+            <div style="margin: 15px 0;">
+                <button onclick="testArticle()" class="btn btn-primary" style="margin-right: 10px;">🚀 Test Article Flow</button>
+                <button onclick="clearData()" class="btn btn-danger">🗑️ Clear All Data</button>
+            </div>
+            
+            <p style="font-size: 0.9rem; color: #666; margin-top: 15px;">
+                Test article will open with: 15s countdown → Click Here → Scroll → Continue → Redirect to Google
+            </p>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>⚠️ Important Notes</h3>
+            <ul>
+                <li>URLs are stored in browser localStorage</li>
+                <li>Works with file:// protocol (no server needed)</li>
+                <li>Articles auto-generate based on title</li>
+                <li>15-second countdown → Click → Scroll → Continue flow</li>
+            </ul>
+        </div>
+        
+        <p><a href="index.html" class="btn btn-secondary">← Back to Home</a></p>
+    </div>
+    
+    <script>
+        function testArticle() {
+            // Create a test URL entry if none exists
+            const testUrl = {
+                id: 'demo123',
+                title: 'Complete Digital Marketing Guide 2024',
+                slug: 'complete-digital-marketing-guide-2024',
+                targetUrl: 'https://google.com',
+                createdAt: new Date().toISOString()
+            };
+            
+            // Add to localStorage if not exists
+            const urls = JSON.parse(localStorage.getItem('adminUrls') || '[]');
+            if (!urls.find(url => url.id === 'demo123')) {
+                urls.push(testUrl);
+                localStorage.setItem('adminUrls', JSON.stringify(urls));
+            }
+            
+            // Show loading message
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '⏳ Opening...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                // Open test article
+                window.open('article.html?id=demo123&slug=complete-digital-marketing-guide-2024', '_blank');
+                
+                // Reset button
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 500);
+        }
+        
+        function clearData() {
+            if (confirm('Are you sure you want to clear all stored URLs?')) {
+                localStorage.removeItem('adminUrls');
+                alert('All data cleared successfully!');
+            }
+        }
+    </script>
+</body>
+</html>

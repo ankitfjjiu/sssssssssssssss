@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Article - ArticleHub</title>
+    <meta name="description" content="Loading article content...">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="loading" style="text-align: center; padding: 100px 20px; font-family: Inter, sans-serif;">
+        <div style="display: inline-block; width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 30px;"></div>
+        <h2 style="color: #333; margin-bottom: 15px; font-size: 1.8rem;">Loading Article...</h2>
+        <p style="color: #666; font-size: 1.1rem;">Preparing your professional content...</p>
+        <div style="margin-top: 30px;">
+            <div style="width: 200px; height: 4px; background: #f3f3f3; border-radius: 2px; margin: 0 auto; overflow: hidden;">
+                <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #007bff, #0056b3); animation: progress 2s ease-in-out infinite;"></div>
+            </div>
+        </div>
+        <style>
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            @keyframes progress {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+            }
+        </style>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Initialize router immediately
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we have URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            const slug = urlParams.get('slug');
+            
+            if (id && slug) {
+                // Load article data from Supabase first, then fallback to localStorage
+                loadArticleData(id);
+            } else {
+                show404();
+            }
+        });
+        
+        async function loadArticleData(id) {
+            try {
+                // Try to load from Supabase first
+                const urlData = await SupabaseDB.getUrlById(id);
+                
+                if (urlData) {
+                    generateArticle(urlData);
+                } else {
+                    // Fallback to localStorage
+                    const urls = JSON.parse(localStorage.getItem('adminUrls') || '[]');
+                    const localUrlData = urls.find(url => url.id === id);
+                    
+                    if (localUrlData) {
+                        generateArticle(localUrlData);
+                    } else {
+                        show404();
+                    }
+                }
+            } catch (err) {
+                console.warn('Database error, using localStorage fallback:', err);
+                
+                // Fallback to localStorage
+                const urls = JSON.parse(localStorage.getItem('adminUrls') || '[]');
+                const localUrlData = urls.find(url => url.id === id);
+                
+                if (localUrlData) {
+                    generateArticle(localUrlData);
+                } else {
+                    show404();
+                }
+            }
+        }
+        
+        function generateArticle(urlData) {
+            // Set target URL globally
+            window.articleTargetUrl = urlData.targetUrl;
+            
+            // Generate article content
+            const content = generateContent(urlData.title);
+            
+            // Replace page content
+            document.body.innerHTML = getArticleHTML(urlData.title, content, urlData.targetUrl);
+            
+            // Initialize article flow
+            setTimeout(initializeFlow, 100);
+        }
+        
+        function generateContent(title) {
+            return {
+                introduction: `In today's rapidly evolving landscape, understanding ${title.toLowerCase()} has become increasingly important for professionals and enthusiasts alike. This comprehensive guide explores the key aspects and provides valuable insights for readers.`,
+                sections: [
+                    {
+                        title: "Understanding the Fundamentals",
+                        content: "The foundation of any successful approach lies in understanding the core principles and methodologies that drive results in this field."
+                    },
+                    {
+                        title: "Key Strategies and Best Practices", 
+                        content: "Industry experts recommend a systematic approach that balances innovation with proven methodologies to achieve optimal outcomes."
+                    },
+                    {
+                        title: "Implementation and Results",
+                        content: "By focusing on practical implementation and measuring results, organizations can achieve better outcomes and maintain competitive advantages."
+                    }
+                ],
+                conclusion: `In conclusion, ${title.toLowerCase()} represents both opportunities and challenges in today's environment. By staying informed and adopting best practices, individuals and organizations can navigate this landscape successfully.`
+            };
+        }
+        
+        function getArticleHTML(title, content, targetUrl) {
+            return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} - ArticleHub</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <a href="index.html" class="logo">ArticleHub</a>
+                </div>
+                <div class="nav-menu" id="navMenu">
+                    <ul class="nav-list">
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="about.html" class="nav-link">About</a></li>
+                        <li><a href="contact.html" class="nav-link">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="nav-toggle" id="navToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="article-header">
+        <div class="container">
+            <h1 class="article-title-main">${title}</h1>
+            <p class="article-meta-main">Published on ${new Date().toLocaleDateString()} | Professional Analysis</p>
+        </div>
+    </section>
+
+    <main class="article-body">
+        <div class="container">
+            <div class="article-content-main">
+                <p>${content.introduction}</p>
+                
+                <h2>${content.sections[0].title}</h2>
+                <p>${content.sections[0].content}</p>
+                
+                <div class="countdown-container">
+                    <div class="countdown-timer">15</div>
+                    <p class="countdown-text">Please wait while we prepare your content...</p>
+                </div>
+                
+                <h2>${content.sections[1].title}</h2>
+                <p>${content.sections[1].content}</p>
+                
+                <h2>${content.sections[2].title}</h2>
+                <p>${content.sections[2].content}</p>
+                
+                <h2>Key Takeaways</h2>
+                <p>Understanding the nuances of this topic requires careful consideration of multiple factors and perspectives. The insights shared in this article provide a foundation for further exploration and practical application.</p>
+                
+                <h2>Looking Forward</h2>
+                <p>As this field continues to evolve, staying informed about new developments and best practices will be crucial for success. We encourage readers to continue their learning journey and apply these insights in their professional endeavors.</p>
+                
+                <p>${content.conclusion}</p>
+                
+                <button class="continue-btn" id="continueBtn" style="opacity: 0; transform: translateY(20px); transition: all 0.5s ease; background: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 500; cursor: pointer;">Continue to Read</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 class="footer-title">ArticleHub</h3>
+                    <p class="footer-text">Your trusted source for professional articles and insights.</p>
+                </div>
+                <div class="footer-section">
+                    <h4 class="footer-subtitle">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 class="footer-subtitle">Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                        <li><a href="disclaimer.html">Disclaimer</a></li>
+                        <li><a href="dmca.html">DMCA</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ArticleHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>`;
+        }
+        
+        function initializeFlow() {
+            let hasClickedButton = false;
+            let hasScrolledToBottom = false;
+            
+            // Start 15-second countdown
+            startCountdown();
+            
+            // Setup scroll detection
+            setupScrollDetection();
+            
+            function startCountdown() {
+                const countdownContainer = document.querySelector('.countdown-container');
+                if (!countdownContainer) return;
+                
+                let timeLeft = 15;
+                const timerElement = countdownContainer.querySelector('.countdown-timer');
+                
+                const countdown = setInterval(() => {
+                    if (timerElement) {
+                        timerElement.textContent = timeLeft;
+                    }
+                    timeLeft--;
+                    
+                    if (timeLeft < 0) {
+                        clearInterval(countdown);
+                        showClickButton();
+                    }
+                }, 1000);
+            }
+            
+            function showClickButton() {
+                const countdownContainer = document.querySelector('.countdown-container');
+                if (!countdownContainer) return;
+                
+                countdownContainer.innerHTML = `
+                    <button class="click-here-btn" id="clickHereBtn" style="background: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 500; cursor: pointer; margin: 1rem 0; display: inline-block; transition: all 0.3s ease;">Read Article</button>
+                `;
+                
+                document.getElementById('clickHereBtn').addEventListener('click', handleClickHere);
+            }
+            
+            function handleClickHere() {
+                hasClickedButton = true;
+                const countdownContainer = document.querySelector('.countdown-container');
+                if (countdownContainer) {
+                    countdownContainer.innerHTML = ''; // Clear the container
+                }
+                // Show the continue button immediately after clicking Read Article
+                showContinueButton();
+            }
+            
+            function setupScrollDetection() {
+                let ticking = false;
+                
+                const checkScroll = () => {
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const windowHeight = window.innerHeight;
+                    const documentHeight = document.documentElement.scrollHeight;
+                    
+                    if (scrollTop + windowHeight >= documentHeight - 100) {
+                        hasScrolledToBottom = true;
+                        checkShowContinueButton();
+                    }
+                    
+                    ticking = false;
+                };
+                
+                window.addEventListener('scroll', () => {
+                    if (!ticking) {
+                        requestAnimationFrame(checkScroll);
+                        ticking = true;
+                    }
+                });
+            }
+            
+            function checkShowContinueButton() {
+                if (hasClickedButton && hasScrolledToBottom) {
+                    const countdownContainer = document.querySelector('.countdown-container');
+                    if (countdownContainer) {
+                        countdownContainer.innerHTML = `
+                            <div style="color: #007bff; font-size: 0.9rem; margin: 1rem 0; padding: 8px 16px; display: inline-block;">
+                                Scroll down and continue
+                            </div>
+                        `;
+                    }
+                }
+            }
+            
+            function showContinueButton() {
+                const continueBtn = document.querySelector('.continue-btn');
+                if (continueBtn && window.articleTargetUrl) {
+                    // Make sure the button is visible and interactive
+                    continueBtn.style.display = 'inline-block';
+                    continueBtn.style.opacity = '1';
+                    continueBtn.style.transform = 'translateY(0)';
+                    
+                    // Only add the click handler once
+                    if (!continueBtn.hasAttribute('data-click-handler')) {
+                        continueBtn.setAttribute('data-click-handler', 'true');
+                        continueBtn.addEventListener('click', () => {
+                            window.open(window.articleTargetUrl, '_blank');
+                        });
+                    }
+                }
+            }
+        }
+        
+        function show404() {
+            document.body.innerHTML = `
+                <div style="text-align: center; padding: 100px 20px; font-family: Inter, sans-serif;">
+                    <h1 style="font-size: 3rem; color: #333; margin-bottom: 1rem;">404</h1>
+                    <h2 style="color: #666; margin-bottom: 2rem;">Article Not Found</h2>
+                    <p style="color: #999; margin-bottom: 2rem;">The article you're looking for doesn't exist or has been removed.</p>
+                    <a href="index.html" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">Go Home</a>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

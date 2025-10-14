@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - ArticleHub</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <a href="/" class="logo">ArticleHub</a>
+                </div>
+                <div class="nav-menu">
+                    <ul class="nav-list">
+                        <li><a href="/" class="nav-link">Home</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-content">
+        <div class="container">
+            <div class="admin-container">
+                <!-- Content will be dynamically loaded by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Initialize admin panel
+        let adminPanel;
+        document.addEventListener('DOMContentLoaded', function() {
+            adminPanel = new AdminPanel();
+        });
+    </script>
+</body>
+</html>
